@@ -1,8 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 
 const whatsappNumber = "212674145890";
+const googleFormAction = "https://docs.google.com/forms/d/e/1FAIpQLSdDqnvH8D_VR9dx7nXJLI64r8rqNnLL3GRp1xDNQ9s8QxDmig/formResponse";
 const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
   "Bonjour CasaLangue, je souhaite en savoir plus sur vos cours.",
 )}`;
@@ -21,27 +22,8 @@ const testimonials = [
 
 export default function Home() {
   const [sent, setSent] = useState(false);
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const form = new FormData(event.currentTarget);
-    const name = String(form.get("name") ?? "");
-    const phone = String(form.get("phone") ?? "");
-    const program = String(form.get("program") ?? "");
-    const message = [
-      "Bonjour CasaLangue, je souhaite réserver mon test de niveau gratuit.",
-      "",
-      `Nom : ${name}`,
-      `Téléphone : ${phone}`,
-      `Programme : ${program}`,
-    ].join("\n");
-
-    window.open(
-      `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
-    setSent(true);
+  function handleSubmit() {
+    window.setTimeout(() => setSent(true), 400);
   }
 
   return (
@@ -114,10 +96,11 @@ export default function Home() {
       </section>
 
       <section className="contact" id="contact">
-        <div className="contact-copy"><p className="kicker light">Prêt·e à commencer ?</p><h2>Votre premier cours<br />commence ici.</h2><p>Laissez-nous vos coordonnées. Votre demande sera préparée et envoyée directement sur WhatsApp.</p><div className="contact-details"><div><span>Nous trouver</span><strong>Maarif, Casablanca</strong></div><div><span>Nous appeler</span><strong>+212 6 74 14 58 90</strong></div></div></div>
+        <div className="contact-copy"><p className="kicker light">Prêt·e à commencer ?</p><h2>Votre premier cours<br />commence ici.</h2><p>Laissez-nous vos coordonnées. Votre demande sera enregistrée et nous vous contacterons prochainement sur WhatsApp.</p><div className="contact-details"><div><span>Nous trouver</span><strong>Maarif, Casablanca</strong></div><div><span>Nous appeler</span><strong>+212 6 74 14 58 90</strong></div></div></div>
         <div className="form-card">
-          {sent ? <div className="success-message" role="status"><span>✓</span><h3>Votre message est prêt !</h3><p>WhatsApp s’est ouvert avec votre demande. Il ne reste plus qu’à appuyer sur « Envoyer ».</p><button type="button" onClick={() => setSent(false)}>Préparer une autre demande</button></div> :
-          <form onSubmit={handleSubmit}><div className="form-heading"><span>Test de niveau offert</span><strong>2 minutes</strong></div><label>Votre nom<input name="name" type="text" placeholder="Ex. Amine Alaoui" required /></label><label>Votre numéro WhatsApp<input name="phone" type="tel" placeholder="+212 6 00 00 00 00" required /></label><label>Programme souhaité<select name="program" defaultValue=""><option value="" disabled>Choisir un programme</option>{courses.map((course) => <option key={course.title}>{course.title}</option>)}</select></label><button className="button button-primary form-submit" type="submit">Je réserve mon test gratuit <span aria-hidden="true">→</span></button><small className="form-note">En envoyant ce formulaire, vous acceptez d’être contacté·e par CasaLangue.</small></form>}
+          <iframe className="form-target" name="google-form-submit" title="Envoi sécurisé du formulaire" />
+          {sent ? <div className="success-message" role="status"><span>✓</span><h3>Demande enregistrée !</h3><p>Merci. Votre demande a bien été reçue et nous vous contacterons prochainement sur WhatsApp.</p><button type="button" onClick={() => setSent(false)}>Envoyer une autre demande</button></div> :
+          <form action={googleFormAction} method="POST" target="google-form-submit" onSubmit={handleSubmit}><div className="form-heading"><span>Test de niveau offert</span><strong>2 minutes</strong></div><label>Votre nom<input name="entry.182335687" type="text" placeholder="Ex. Amine Alaoui" required /></label><label>Votre numéro WhatsApp<input name="entry.1966472586" type="tel" placeholder="+212 6 00 00 00 00" required /></label><label>Programme souhaité<select name="entry.2053561465" defaultValue="" required><option value="" disabled>Choisir un programme</option>{courses.map((course) => <option key={course.title}>{course.title}</option>)}</select></label><label>Créneau préféré<select name="entry.482706801" defaultValue="" required><option value="" disabled>Choisir un créneau</option><option>Matin (9h–12h)</option><option>Après-midi (14h–17h)</option><option>Soir (18h–21h)</option><option>Samedi</option></select></label><label>Votre objectif <span className="optional">Facultatif</span><textarea name="entry.27189426" placeholder="Ex. Améliorer mon anglais pour le travail" rows={3} /></label><button className="button button-primary form-submit" type="submit">Je réserve mon test gratuit <span aria-hidden="true">→</span></button><small className="form-note">Vos réponses sont enregistrées via Google Forms. En envoyant ce formulaire, vous acceptez d’être contacté·e par CasaLangue.</small></form>}
         </div>
       </section>
 
