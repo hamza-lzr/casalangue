@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "CasaLangue | Cours d’anglais à Casablanca",
   description: "Progressez en anglais avec des cours pratiques en petits groupes à Casablanca. Test de niveau gratuit.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
