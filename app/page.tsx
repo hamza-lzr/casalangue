@@ -49,7 +49,7 @@ export default function Home() {
       <aside className="demo-bar" aria-label="Informations sur cette démonstration">
         <span>Site de démonstration</span>
         <span className="demo-bar-credit">
-          Conçu par <strong>Hamza Lazaar</strong>
+          Solution sur mesure par <strong>Hamza Lazaar</strong>
           <a href="mailto:lazaarhamza561@gmail.com">lazaarhamza561@gmail.com</a>
         </span>
       </aside>
@@ -119,6 +119,30 @@ export default function Home() {
         <div className="form-card">
           {sent ? <div className="success-message" role="status"><span>✓</span><h3>Votre message est prêt !</h3><p>WhatsApp s’est ouvert avec votre demande. Il ne reste plus qu’à appuyer sur « Envoyer ».</p><button type="button" onClick={() => setSent(false)}>Préparer une autre demande</button></div> :
           <form onSubmit={handleSubmit}><div className="form-heading"><span>Test de niveau offert</span><strong>2 minutes</strong></div><label>Votre nom<input name="name" type="text" placeholder="Ex. Amine Alaoui" required /></label><label>Votre numéro WhatsApp<input name="phone" type="tel" placeholder="+212 6 00 00 00 00" required /></label><label>Programme souhaité<select name="program" defaultValue=""><option value="" disabled>Choisir un programme</option>{courses.map((course) => <option key={course.title}>{course.title}</option>)}</select></label><button className="button button-primary form-submit" type="submit">Je réserve mon test gratuit <span aria-hidden="true">→</span></button><small className="form-note">En envoyant ce formulaire, vous acceptez d’être contacté·e par CasaLangue.</small></form>}
+        </div>
+      </section>
+
+      <section className="creator-section" aria-labelledby="creator-title">
+        <div className="creator-heading">
+          <p className="kicker">Derrière cette démo</p>
+          <h2 id="creator-title">Une idée métier ?<br /><em>Construisons-la.</em></h2>
+        </div>
+        <div className="creator-content">
+          <p>
+            Je conçois des solutions numériques sur mesure, adaptées à votre
+            activité — du premier prototype à la mise en ligne.
+          </p>
+          <ul aria-label="Types de solutions proposées">
+            <li><span>01</span> Sites web & plateformes métier</li>
+            <li><span>02</span> Forums & espaces communautaires</li>
+            <li><span>03</span> Applications desktop de gestion</li>
+            <li><span>04</span> Automatisations & outils internes</li>
+          </ul>
+          <div className="creator-actions">
+            <a className="button button-primary" href="mailto:lazaarhamza561@gmail.com?subject=Projet%20sur%20mesure">Discuter de votre projet <span aria-hidden="true">↗</span></a>
+            <a className="creator-whatsapp" href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour Hamza, j’ai un projet de solution sur mesure dont j’aimerais discuter.")}`}>Écrire sur WhatsApp <span aria-hidden="true">→</span></a>
+          </div>
+          <p className="creator-signature"><strong>Hamza Lazaar</strong><span>Ingénieur logiciel · Casablanca</span></p>
         </div>
       </section>
 
