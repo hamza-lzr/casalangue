@@ -49,8 +49,7 @@ export default function Home() {
       <aside className="demo-bar" aria-label="Informations sur cette démonstration">
         <span>Site de démonstration</span>
         <span className="demo-bar-credit">
-          Solution sur mesure par <strong>Hamza Lazaar</strong>
-          <a href="mailto:lazaarhamza561@gmail.com">lazaarhamza561@gmail.com</a>
+          <strong>Solution sur mesure</strong>
         </span>
       </aside>
       <header className="site-header">
@@ -142,7 +141,6 @@ export default function Home() {
             <a className="button button-primary" href="mailto:lazaarhamza561@gmail.com?subject=Projet%20sur%20mesure">Discuter de votre projet <span aria-hidden="true">↗</span></a>
             <a className="creator-whatsapp" href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent("Bonjour Hamza, j’ai un projet de solution sur mesure dont j’aimerais discuter.")}`}>Écrire sur WhatsApp <span aria-hidden="true">→</span></a>
           </div>
-          <p className="creator-signature"><strong>Hamza Lazaar</strong><span>Ingénieur logiciel · Casablanca</span></p>
         </div>
       </section>
 
