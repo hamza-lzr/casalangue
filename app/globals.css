@@ -193,9 +193,20 @@ nav {
 nav a {
   transition: opacity 0.2s, transform 0.2s;
 }
-nav a:hover {
+nav a:hover,
+.nav-button:hover {
   opacity: 0.85;
   transform: translateY(-1px);
+}
+.nav-button {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
 }
 .nav-highlight {
   color: var(--coral);
@@ -712,20 +723,29 @@ h1 em, h2 em {
 .course-meta strong {
   font-size: 13px;
 }
-.course-card > a {
+.course-card > a,
+.course-demo-action {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   margin-top: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   font-size: 12px;
   font-weight: 800;
+  cursor: pointer;
   transition: color 0.2s ease;
 }
-.course-card > a span {
+.course-card > a span,
+.course-demo-action span {
   display: inline-block;
   transition: transform 0.2s ease;
 }
-.course-card:hover > a span {
+.course-card:hover > a span,
+.course-card:hover .course-demo-action span {
   transform: translateX(5px);
 }
 
@@ -1121,6 +1141,152 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ============================================================
+   Boundary between the fictional demo and real contact area
+============================================================ */
+.demo-end {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 20px 28px;
+  background: var(--ink);
+  color: white;
+  text-align: center;
+}
+.demo-end span {
+  color: var(--yellow);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.demo-end small {
+  color: #c7d3cf;
+  font-size: 11px;
+}
+
+/* ============================================================
+   Real solution and prospect contact area
+============================================================ */
+.solution-section {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 90px;
+  padding: 105px max(32px, calc((100vw - 1176px) / 2));
+  background: var(--yellow);
+}
+.solution-intro h2 {
+  max-width: 620px;
+  font-size: clamp(50px, 5vw, 72px);
+}
+.solution-intro h2 em {
+  color: var(--coral);
+}
+.solution-intro > p:not(.kicker) {
+  max-width: 570px;
+  margin: 24px 0 30px;
+  color: #46534f;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.solution-intro ul {
+  max-width: 590px;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(23, 45, 40, 0.22);
+}
+.solution-intro li {
+  display: grid;
+  grid-template-columns: minmax(155px, 0.8fr) 1.2fr;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(23, 45, 40, 0.22);
+}
+.solution-intro li strong {
+  font-size: 12px;
+}
+.solution-intro li span {
+  color: #56635f;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.prospect-form-card {
+  align-self: start;
+  min-height: 500px;
+}
+.form-submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================================
+   Fictional interaction disclosure modal
+============================================================ */
+.demo-modal-backdrop {
+  position: fixed;
+  z-index: 300;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(10, 24, 21, 0.76);
+  backdrop-filter: blur(7px);
+  animation: fadeIn 0.2s ease;
+}
+.demo-modal {
+  position: relative;
+  width: min(100%, 610px);
+  padding: 46px;
+  background: var(--paper);
+  box-shadow: 14px 14px 0 rgba(242, 206, 101, 0.72);
+}
+.demo-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.demo-modal-label {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 6px 9px;
+  border-radius: 2px;
+  background: var(--mint);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.demo-modal h2 {
+  max-width: 500px;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 0.98;
+}
+.demo-modal p {
+  max-width: 500px;
+  margin: 22px 0 30px;
+  color: #596965;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.demo-modal-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ============================================================
    Creator Freelance Section (#createur)
 ============================================================ */
 .creator-section {
@@ -1276,6 +1442,7 @@ footer p, footer > span {
   .method { grid-template-columns: 1fr; }
   .method-visual { min-height: 560px; }
   .contact { grid-template-columns: 1fr; gap: 50px; }
+  .solution-section { grid-template-columns: 1fr; gap: 55px; }
   .creator-section { grid-template-columns: 1fr; gap: 45px; }
   footer { flex-direction: column; text-align: center; padding: 45px 25px 110px; }
   
@@ -1301,6 +1468,7 @@ footer p, footer > span {
     to { transform: translateY(0); opacity: 1; }
   }
   .dock-btn {
+    border: 0;
     flex: 1;
     display: inline-flex;
     align-items: center;
@@ -1412,7 +1580,7 @@ footer p, footer > span {
   .section {
     padding: 85px 20px;
   }
-  .section-heading h2, .method-copy h2, .contact-copy h2, .creator-heading h2 {
+  .section-heading h2, .method-copy h2, .contact-copy h2, .creator-heading h2, .solution-intro h2 {
     font-size: 46px;
   }
   .method-copy {
@@ -1430,6 +1598,18 @@ footer p, footer > span {
   }
   .contact {
     padding: 75px 20px;
+  }
+  .demo-end {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .solution-section {
+    padding: 75px 20px;
+  }
+  .solution-intro li {
+    grid-template-columns: 1fr;
+    gap: 5px;
   }
   .contact-details {
     flex-direction: column;
@@ -1449,6 +1629,14 @@ footer p, footer > span {
     font-size: 21px;
   }
   .creator-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .demo-modal {
+    padding: 40px 22px 26px;
+    box-shadow: 7px 7px 0 rgba(242, 206, 101, 0.72);
+  }
+  .demo-modal-actions {
     align-items: stretch;
     flex-direction: column;
   }

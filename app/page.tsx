@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const whatsappNumber = "212674145890";
 const googleFormAction = "https://docs.google.com/forms/d/e/1FAIpQLSdDqnvH8D_VR9dx7nXJLI64r8rqNnLL3GRp1xDNQ9s8QxDmig/formResponse";
 
 // Demo lead capture link (for visitors testing the fictional school)
 const whatsappDemoHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  "Bonjour CasaLangue, je souhaite en savoir plus sur vos cours.",
+  "Bonjour, je teste la démonstration fictive CasaLangue et son parcours WhatsApp.",
 )}`;
 
 // Direct freelance contact link (for business prospects wishing to hire Hamza)
 const whatsappFreelanceHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  "Bonjour Hamza, j’ai découvert votre démo CasaLangue et je souhaite échanger sur un projet web pour mon activité.",
+  "Bonjour, j’ai découvert la démo CasaLangue et je souhaite échanger sur une solution sur mesure pour mon activité.",
 )}`;
 
 const courses = [
@@ -28,7 +28,11 @@ const testimonials = [
 ];
 
 export default function Home() {
-  const [sent, setSent] = useState(false);
+  const [formState, setFormState] = useState<"idle" | "submitting" | "sent">("idle");
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const lastTriggerRef = useRef<HTMLElement | null>(null);
+  const submissionPendingRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -48,8 +52,64 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  const closeDemoModal = useCallback((restoreFocus = true) => {
+    setIsDemoModalOpen(false);
+    if (restoreFocus) {
+      window.requestAnimationFrame(() => lastTriggerRef.current?.focus());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isDemoModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusableSelector = 'a[href], button:not([disabled])';
+    const focusableElements = modalRef.current?.querySelectorAll<HTMLElement>(focusableSelector);
+    focusableElements?.[0]?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeDemoModal();
+        return;
+      }
+
+      if (event.key !== "Tab" || !modalRef.current) return;
+      const focusable = Array.from(modalRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closeDemoModal, isDemoModalOpen]);
+
+  function openDemoModal(trigger: HTMLElement) {
+    lastTriggerRef.current = trigger;
+    setIsDemoModalOpen(true);
+  }
+
   function handleSubmit() {
-    window.setTimeout(() => setSent(true), 400);
+    submissionPendingRef.current = true;
+    setFormState("submitting");
+  }
+
+  function handleFormResponse() {
+    if (!submissionPendingRef.current) return;
+    submissionPendingRef.current = false;
+    setFormState("sent");
   }
 
   return (
@@ -57,15 +117,12 @@ export default function Home() {
       {/* Interactive Top Prospect Banner */}
       <aside className="demo-bar" aria-label="Informations sur cette démonstration">
         <div className="demo-bar-left">
-          <span className="demo-bar-badge">✦ Démo Interactive</span>
-          <span className="demo-bar-credit">
-            Conçue par <strong>Hamza Lazaar</strong>
-          </span>
+          <span className="demo-bar-badge">✦ Démo fictive : CasaLangue</span>
         </div>
         <div className="demo-bar-right">
-          <span className="demo-bar-pitch">Besoin d’un site sur mesure & capture WhatsApp pour votre activité ?</span>
-          <a className="demo-bar-cta" href="#createur">
-            Discuter de votre projet <span aria-hidden="true">→</span>
+          <span className="demo-bar-pitch">Un exemple concret de solution conçue pour une activité.</span>
+          <a className="demo-bar-cta" href="#solution-sur-mesure">
+            Solution sur mesure <span aria-hidden="true">→</span>
           </a>
         </div>
       </aside>
@@ -79,15 +136,15 @@ export default function Home() {
         <nav aria-label="Navigation principale">
           <a href="#programmes">Programmes</a>
           <a href="#methode">Notre méthode</a>
-          <a href="#contact">Contact Démo</a>
-          <a className="nav-highlight" href="#createur">✦ Votre projet web</a>
+          <button className="nav-button" type="button" onClick={(event) => openDemoModal(event.currentTarget)}>Tester l’inscription</button>
+          <a className="nav-highlight" href="#solution-sur-mesure">✦ Solution sur mesure</a>
         </nav>
         <div className="header-actions">
-          <a className="button button-small button-dark" href={whatsappDemoHref} title="Tester le WhatsApp de l’école">
+          <button className="button button-small button-dark" type="button" onClick={(event) => openDemoModal(event.currentTarget)} title="Tester le parcours WhatsApp fictif">
             Tester WhatsApp <span aria-hidden="true">↗</span>
-          </a>
-          <a className="button button-small button-primary" href="#createur">
-            Créer votre site
+          </button>
+          <a className="button button-small button-primary" href="#solution-sur-mesure">
+            Solution sur mesure
           </a>
         </div>
       </header>
@@ -99,7 +156,7 @@ export default function Home() {
           <h1>L’anglais qui vous fait <em>avancer.</em></h1>
           <p className="hero-lead">Des cours en petits groupes, pensés pour parler avec aisance — au travail, en voyage et au quotidien.</p>
           <div className="hero-actions">
-            <a className="button button-primary" href={whatsappDemoHref}>Réserver un cours d’essai <span aria-hidden="true">↗</span></a>
+            <button className="button button-primary" type="button" onClick={(event) => openDemoModal(event.currentTarget)}>Tester la réservation WhatsApp <span aria-hidden="true">↗</span></button>
             <a className="text-link" href="#programmes">Découvrir les programmes <span aria-hidden="true">↓</span></a>
           </div>
           <div className="hero-proof" aria-label="Points forts">
@@ -149,9 +206,9 @@ export default function Home() {
                 <span>{course.schedule}</span>
                 <strong>{course.price}</strong>
               </div>
-              <a href="#contact" aria-label={`S’inscrire au programme ${course.title}`}>
-                Voir le programme <span aria-hidden="true">→</span>
-              </a>
+              <button className="course-demo-action" type="button" onClick={(event) => openDemoModal(event.currentTarget)} aria-label={`Tester l’inscription au programme ${course.title}`}>
+                Tester l’inscription <span aria-hidden="true">→</span>
+              </button>
             </article>
           ))}
         </div>
@@ -227,131 +284,71 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Demo Contact / Lead Capture Form */}
-      <section className="contact" id="contact">
-        <div className="contact-copy reveal">
-          <p className="kicker light">Prêt·e à commencer ?</p>
-          <h2>Votre premier cours<br />commence ici.</h2>
-          <p>Laissez vos coordonnées pour tester le parcours apprenant. La demande sera enregistrée et prête pour un contact WhatsApp.</p>
-          <div className="contact-details">
-            <div>
-              <span>Localisation démo</span>
-              <strong>Maarif, Casablanca</strong>
-            </div>
-            <div>
-              <span>WhatsApp Démo</span>
-              <strong>+212 6 74 14 58 90</strong>
-            </div>
+      <div className="demo-end" role="separator" aria-label="Fin de la démonstration CasaLangue">
+        <span>Fin de la démonstration CasaLangue</span>
+        <small>La section suivante vous permet de parler de votre propre besoin.</small>
+      </div>
+
+      {/* Real prospect area */}
+      <section className="solution-section" id="solution-sur-mesure" aria-labelledby="solution-title">
+        <div className="solution-intro reveal">
+          <p className="kicker">Solution sur mesure</p>
+          <h2 id="solution-title">Une idée pour votre activité ?<br /><em>Construisons-la.</em></h2>
+          <p>
+            Cette démo montre le niveau de finition, l’expérience mobile et les parcours de conversion qui peuvent être adaptés à votre activité.
+          </p>
+          <ul aria-label="Exemples de solutions sur mesure">
+            <li><strong>Sites et expériences web</strong><span>Vitrines, landing pages et espaces clients.</span></li>
+            <li><strong>Plateformes métier</strong><span>Réservations, tableaux de bord et portails privés.</span></li>
+            <li><strong>Forums et communautés</strong><span>Espaces d’échange conçus autour de vos membres.</span></li>
+            <li><strong>Applications de gestion</strong><span>Outils web ou desktop adaptés à vos opérations.</span></li>
+            <li><strong>Automatisations</strong><span>Connexions, alertes et processus internes simplifiés.</span></li>
+          </ul>
+          <div className="creator-actions">
+            <a className="button button-primary" href={whatsappFreelanceHref} target="_blank" rel="noopener noreferrer">
+              Discuter sur WhatsApp <span aria-hidden="true">↗</span>
+            </a>
+            <a className="button button-dark" href="mailto:lazaarhamza561@gmail.com?subject=Demande%20de%20solution%20sur%20mesure">
+              Envoyer un e-mail <span aria-hidden="true">✉</span>
+            </a>
           </div>
         </div>
-        <div className="form-card reveal delay-1">
-          <iframe className="form-target" name="google-form-submit" title="Envoi sécurisé du formulaire" />
-          {sent ? (
+
+        <div className="form-card prospect-form-card reveal delay-1">
+          <iframe className="form-target" name="google-form-submit" title="Réponse du formulaire de contact" onLoad={handleFormResponse} />
+          {formState === "sent" ? (
             <div className="success-message" role="status">
               <span>✓</span>
-              <h3>Demande enregistrée !</h3>
-              <p>Merci. Votre demande de test a bien été reçue via Google Forms.</p>
-              <button type="button" onClick={() => setSent(false)}>Envoyer une autre demande</button>
+              <h3>Demande transmise</h3>
+              <p>Merci. Votre besoin a bien été envoyé au créateur de cette démonstration.</p>
+              <button type="button" onClick={() => setFormState("idle")}>Envoyer une autre demande</button>
             </div>
           ) : (
             <form action={googleFormAction} method="POST" target="google-form-submit" onSubmit={handleSubmit}>
               <div className="form-heading">
-                <span>Test de niveau offert</span>
-                <strong>Démo interactif</strong>
+                <span>Parlez-moi de votre besoin</span>
+                <strong>Contact réel</strong>
               </div>
               <label>
-                Votre nom
-                <input name="entry.182335687" type="text" placeholder="Ex. Amine Alaoui" required />
+                Nom ou activité
+                <input name="entry.182335687" type="text" placeholder="Ex. Cabinet Atlas" autoComplete="organization" required />
               </label>
               <label>
-                Votre numéro WhatsApp
-                <input name="entry.1966472586" type="tel" placeholder="+212 6 00 00 00 00" required />
+                Numéro WhatsApp
+                <input name="entry.1966472586" type="tel" placeholder="+212 6 00 00 00 00" autoComplete="tel" required />
               </label>
               <label>
-                Programme souhaité
-                <select name="entry.2053561465" defaultValue="" required>
-                  <option value="" disabled>Choisir un programme</option>
-                  {courses.map((course) => (
-                    <option key={course.title}>{course.title}</option>
-                  ))}
-                </select>
+                Description du besoin
+                <textarea name="entry.2053561465" placeholder="Décrivez simplement l’outil ou le problème à résoudre." rows={5} required />
               </label>
-              <label>
-                Créneau préféré
-                <select name="entry.482706801" defaultValue="" required>
-                  <option value="" disabled>Choisir un créneau</option>
-                  <option>Matin (9h–12h)</option>
-                  <option>Après-midi (14h–17h)</option>
-                  <option>Soir (18h–21h)</option>
-                  <option>Samedi</option>
-                </select>
-              </label>
-              <label>
-                Votre objectif <span className="optional">Facultatif</span>
-                <textarea name="entry.27189426" placeholder="Ex. Améliorer mon anglais pour le travail" rows={3} />
-              </label>
-              <button className="button button-primary form-submit" type="submit">
-                Je réserve mon test gratuit <span aria-hidden="true">→</span>
+              <button className="button button-primary form-submit" type="submit" disabled={formState === "submitting"}>
+                {formState === "submitting" ? "Envoi en cours…" : "Envoyer ma demande"} <span aria-hidden="true">→</span>
               </button>
               <small className="form-note">
-                Démonstration technique connectée à Google Forms. Les données envoyées servent de test.
+                Contact réel : ces informations sont transmises à Hamza Lazaar pour répondre à votre demande.
               </small>
             </form>
           )}
-        </div>
-      </section>
-
-      {/* Freelance Creator & Multi-Sector Solutions Section */}
-      <section className="creator-section" id="createur" aria-labelledby="creator-title">
-        <div className="creator-heading reveal">
-          <p className="kicker">Conception sur mesure · Hamza Lazaar</p>
-          <h2 id="creator-title">Une idée pour votre activité ?<br /><em>Construisons-la.</em></h2>
-          <p className="creator-subhead">
-            Cette démo illustre la qualité graphique, l’expérience mobile et la fluidité de conversion que je crée pour les entreprises de services : <strong>centres de formation, cabinets, cliniques, agences et PME</strong>.
-          </p>
-        </div>
-        <div className="creator-content reveal delay-1">
-          <p>
-            Je conçois des solutions numériques rapides, modernes et orientées acquisition — du design sur mesure à l’intégration de vos tunnels WhatsApp.
-          </p>
-          <ul aria-label="Solutions proposées aux entreprises">
-            <li className="reveal delay-1">
-              <span>01</span>
-              <div>
-                <strong>Sites vitrines & Landing pages de haute conversion</strong>
-                <p>Identité visuelle soignée, chargement ultra-rapide et expérience pensée pour transformer les visiteurs en clients.</p>
-              </div>
-            </li>
-            <li className="reveal delay-2">
-              <span>02</span>
-              <div>
-                <strong>Tunnels de capture & Intégrations WhatsApp directes</strong>
-                <p>Formulaires qualifiés et messages pré-remplis pour recevoir instantanément vos leads directement sur WhatsApp.</p>
-              </div>
-            </li>
-            <li className="reveal delay-3">
-              <span>03</span>
-              <div>
-                <strong>Plateformes métier, Espaces clients & Réservations</strong>
-                <p>Portails privés, dashboards de suivi, calendriers de rendez-vous et applications web adaptées à votre flux de travail.</p>
-              </div>
-            </li>
-            <li className="reveal delay-4">
-              <span>04</span>
-              <div>
-                <strong>Automatisations & Digitalisation de processus</strong>
-                <p>Synchronisation vers Google Sheets/CRM, alertes automatiques et outils internes pour gagner des heures chaque semaine.</p>
-              </div>
-            </li>
-          </ul>
-          <div className="creator-actions">
-            <a className="button button-primary" href={whatsappFreelanceHref} target="_blank" rel="noopener noreferrer">
-              Discuter de votre projet sur WhatsApp <span aria-hidden="true">↗</span>
-            </a>
-            <a className="button button-dark" href="mailto:lazaarhamza561@gmail.com?subject=Projet%20site%20web%20sur%20mesure">
-              Envoyer un e-mail direct <span aria-hidden="true">✉</span>
-            </a>
-          </div>
         </div>
       </section>
 
@@ -361,23 +358,42 @@ export default function Home() {
           <span className="brand-mark">C</span>
           <span>CasaLangue</span>
         </a>
-        <p>Projet de démonstration interactive · Conçu pour les entreprises de services</p>
-        <span>
-          Créé par <a className="footer-credit" href="#createur">Hamza Lazaar</a> · 2026
-        </span>
+        <p>Démo fictive · Exemple de solution conçue sur mesure</p>
+        <span>2026</span>
       </footer>
 
       {/* Mobile Floating Action Dock (Optimized for Freelance Prospect Outreach) */}
       <div className="mobile-prospect-dock" aria-label="Actions rapides mobile">
-        <a className="dock-btn dock-btn-ghost" href="#contact" title="Tester le formulaire">
+        <button className="dock-btn dock-btn-ghost" type="button" onClick={(event) => openDemoModal(event.currentTarget)} title="Tester le parcours fictif">
           🧪 Tester démo
-        </a>
+        </button>
         <a className="dock-btn dock-btn-primary" href={whatsappFreelanceHref} target="_blank" rel="noopener noreferrer">
-          💬 Votre projet web <span aria-hidden="true">↗</span>
+          💬 Solution sur mesure <span aria-hidden="true">↗</span>
         </a>
       </div>
+
+      {isDemoModalOpen && (
+        <div className="demo-modal-backdrop" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) closeDemoModal();
+        }}>
+          <div className="demo-modal" ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="demo-modal-title" aria-describedby="demo-modal-description">
+            <button className="demo-modal-close" type="button" onClick={() => closeDemoModal()} aria-label="Fermer la fenêtre">×</button>
+            <span className="demo-modal-label">Démo fictive</span>
+            <h2 id="demo-modal-title">CasaLangue n’est pas un véritable centre.</h2>
+            <p id="demo-modal-description">
+              Cette interaction montre comment un parcours WhatsApp peut fonctionner. Aucun cours ni inscription CasaLangue ne sera créé.
+            </p>
+            <div className="demo-modal-actions">
+              <a className="button button-dark" href={whatsappDemoHref} target="_blank" rel="noopener noreferrer" onClick={() => closeDemoModal(false)}>
+                Continuer vers WhatsApp <span aria-hidden="true">↗</span>
+              </a>
+              <a className="button button-primary" href="#solution-sur-mesure" onClick={() => closeDemoModal(false)}>
+                Découvrir une solution sur mesure <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
-
-
